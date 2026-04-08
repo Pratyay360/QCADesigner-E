@@ -1,0 +1,103 @@
+name: AppImage
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          autoconf \
+          automake \
+          libgtk2.0-dev \
+          librsvg2-dev \
+          libglib2.0-dev \
+          pkg-config \
+          libglib2.0-bin \
+          gettext \
+          file \
+          wget
+
+    - name: Build QCADesignerE
+      run: |
+        cd QCADesignerE
+        ./autogen.sh
+        ./configure --prefix=/usr
+        make -j$(nproc)
+        make install DESTDIR=$(pwd)/AppDir
+
+    - name: Prepare AppDir
+      run: |
+        cd QCADesignerE
+        # Move bin directory if it ended up in a weird place
+        # Usually 'make install DESTDIR=... --prefix=/usr' puts things in DESTDIR/usr/bin
+        # Based on README: "Once installed, the QCADesignerE program will be at QCADesignerE/bin/QCADesignerE"
+        # But autotools typically follows prefix.
+        
+        # Ensure icon is available for linuxdeploy
+        mkdir -p AppDir/usr/share/icons/hicolor/scalable/apps
+        cp pixmaps/QCADesignerE.svg AppDir/usr/share/icons/hicolor/scalable/apps/QCADesignerE.svg
+        
+        # Desktop file needs to be in AppDir/usr/share/applications
+        mkdir -p AppDir/usr/share/applications
+        # The desktop file in the repo might be a template (.in) or generated
+        if [ -f QCADesignerE.desktop ]; then
+          cp QCADesignerE.desktop AppDir/usr/share/applications/
+        else
+          # Create a simple desktop file if not generated
+          cat > AppDir/usr/share/applications/QCADesignerE.desktop <<EOF
+[Desktop Entry]
+Name=QCADesignerE
+Exec=QCADesignerE %f
+Icon=QCADesignerE
+Type=Application
+Categories=Development;Science;
+Comment=QCA-based circuit designer and simulator with energy estimation
+EOF
+        fi
+
+    - name: Download linuxdeploy
+      run: |
+        wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+        wget https://github.com/linuxdeploy/linuxdeploy-plugin-gtk/releases/download/continuous/linuxdeploy-plugin-gtk-x86_64.sh
+        chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk-x86_64.sh
+        # GTK plugin needs to be in the PATH or same directory as linuxdeploy
+        # linuxdeploy looks for plugins in the same directory or in PATH
+        # It expects the name to be linuxdeploy-plugin-<name>.sh or linuxdeploy-plugin-<name>
+        mv linuxdeploy-plugin-gtk-x86_64.sh linuxdeploy-plugin-gtk.sh
+        # Also, linuxdeploy itself needs to be in PATH for some plugins or relative lookups
+        # or we just call it with absolute/relative path.
+
+    - name: Create AppImage
+      run: |
+        cd QCADesignerE
+        # We need to set some env vars for linuxdeploy
+        export VERSION=$(git rev-parse --short HEAD)
+        export PATH=$PATH:$(pwd)/..
+        ../linuxdeploy-x86_64.AppImage --appdir AppDir \
+          -e AppDir/usr/bin/QCADesignerE \
+          -d AppDir/usr/share/applications/QCADesignerE.desktop \
+          -i AppDir/usr/share/icons/hicolor/scalable/apps/QCADesignerE.svg \
+          --plugin gtk \
+          --output appimage
+        mv QCADesignerE-${VERSION}-x86_64.AppImage ../QCADesignerE-x86_64.AppImage
+      env:
+        DEPLOY_GTK_VERSION: 2
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: QCADesignerE-AppImage
+        path: QCADesignerE-x86_64.AppImage

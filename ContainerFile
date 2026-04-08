@@ -1,0 +1,2 @@
+Use zigzigcheers/go-gtk2 as base
+copy QCADesigner-E .
