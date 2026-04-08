@@ -1,2 +1,64 @@
-Use zigzigcheers/go-gtk2 as base
-copy QCADesigner-E .
+# Stage 1: build
+FROM docker.io/luigidifraia/gtk2-dev:alpine-3.20.3 AS builder
+
+RUN apk add --no-cache \
+    autoconf \
+    automake \
+    make \
+    gcc \
+    musl-dev \
+    pkgconfig \
+    gtk+2.0-dev \
+    glib-dev \
+    librsvg-dev \
+    gettext-dev \
+    intltool \
+    file \
+    wget \
+    bash
+
+COPY . /app
+WORKDIR /app/QCADesignerE
+
+RUN chmod +x autogen.sh configure install-sh compile depcomp missing mkinstalldirs
+RUN ./autogen.sh
+RUN ./configure --prefix=/usr
+RUN make -j$(nproc)
+RUN make install DESTDIR=/app/AppDir
+
+# Stage 2: assemble AppDir and build AppImage
+FROM builder AS appimage
+
+# Prepare icon and desktop file
+RUN mkdir -p /app/AppDir/usr/share/icons/hicolor/48x48/apps \
+             /app/AppDir/usr/share/icons/hicolor/scalable/apps \
+             /app/AppDir/usr/share/applications
+
+RUN cp /app/QCADesignerE/pixmaps/QCADesignerE_0_48x48x24a.png \
+       /app/AppDir/usr/share/icons/hicolor/48x48/apps/QCADesignerE.png && \
+    cp /app/QCADesignerE/pixmaps/QCADesignerE.svg \
+       /app/AppDir/usr/share/icons/hicolor/scalable/apps/QCADesignerE.svg
+
+RUN printf '[Desktop Entry]\nName=QCADesignerE\nExec=QCADesignerE %%f\nIcon=QCADesignerE\nType=Application\nCategories=Development;Science;Education;\nComment=QCA circuit designer and simulator\n' \
+    > /app/AppDir/usr/share/applications/QCADesignerE.desktop
+
+# Download linuxdeploy and GTK plugin (x86_64)
+RUN wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage \
+         -O /usr/local/bin/linuxdeploy && \
+    chmod +x /usr/local/bin/linuxdeploy
+
+RUN wget -q https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh \
+         -O /usr/local/bin/linuxdeploy-plugin-gtk.sh && \
+    chmod +x /usr/local/bin/linuxdeploy-plugin-gtk.sh
+
+WORKDIR /app
+
+RUN DEPLOY_GTK_VERSION=2 \
+    OUTPUT=QCADesignerE-x86_64.AppImage \
+    linuxdeploy \
+      --appdir AppDir \
+      --executable AppDir/usr/bin/QCADesignerE \
+      --desktop-file AppDir/usr/share/applications/QCADesignerE.desktop \
+      --icon-file AppDir/usr/share/icons/hicolor/48x48/apps/QCADesignerE.png \
+      --plugin gtk \
+      --output appimage
