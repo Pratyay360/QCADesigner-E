@@ -47,6 +47,20 @@ Run QCADesignerE with
 $ bin\QCADesigner &
 ```
 
+
+Self-contained AppImage
+=======================
+A self-contained Linux AppImage can be generated with the provided multi-stage container build:
+
+```sh
+docker build --file ContainerFile --target appimage --tag qcadesignere-appimage .
+id=$(docker create qcadesignere-appimage)
+docker cp "$id:/app/QCADesignerE-x86_64.AppImage" ./QCADesignerE-x86_64.AppImage
+docker rm "$id"
+```
+
+The resulting `QCADesignerE-x86_64.AppImage` includes GTK2 runtime dependencies via `linuxdeploy` + the GTK plugin, so it can be distributed as a single application image.
+
 Information
 ===========
 - You can find a list of pre-implemented cells in the folder "circuits".
