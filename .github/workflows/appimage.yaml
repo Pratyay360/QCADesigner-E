@@ -2,6 +2,7 @@ name: AppImage
 on:
   push:
     branches: ["main", "master"]
+    tags: ["v*"]  # Also trigger on version tags
   pull_request:
     branches: ["main", "master"]
   workflow_dispatch:
@@ -28,8 +29,18 @@ jobs:
           docker rm "$id"
 
       - name: Upload AppImage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@main
         with:
           name: QCADesignerE-AppImage
           path: ./QCA*.AppImage
           if-no-files-found: error
+
+      - name: Create Release and Upload Asset
+        if: startsWith(github.ref, 'refs/tags/')  # Only run on tag pushes
+        uses: softprops/action-gh-release@latest
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: QCADesignerE-x86_64.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
