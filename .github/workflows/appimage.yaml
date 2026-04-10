@@ -1,8 +1,8 @@
 name: AppImage
+
 on:
   push:
     branches: ["main", "master"]
-    tags: ["v*"]  # Also trigger on version tags
   pull_request:
     branches: ["main", "master"]
   workflow_dispatch:
@@ -29,14 +29,48 @@ jobs:
           docker rm "$id"
 
       - name: Upload AppImage artifact
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v4
         with:
           name: QCADesignerE-AppImage
-          path: ./QCA*.AppImage
-          if-no-files-found: error
+          path: QCADesignerE-x86_64.AppImage
+          if-no-files-found: error    make this release artifacts name: AppImage
 
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build AppImage inside Docker
+        run: |
+          docker build \
+            --file ContainerFile \
+            --target appimage \
+            --tag qcadesignere-appimage \
+            .
+
+      - name: Extract AppImage from container
+        run: |
+          id=$(docker create qcadesignere-appimage)
+          docker cp "$id:/app/QCADesignerE-x86_64.AppImage" ./QCADesignerE-x86_64.AppImage
+          docker rm "$id"
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QCADesignerE-AppImage
+          path: QCADesignerE-x86_64.AppImage
+          if-no-files-found: error    make this release artifacts    
+          
       - name: Create Release and Upload Asset
-        if: startsWith(github.ref, 'refs/tags/')  # Only run on tag pushes
         uses: softprops/action-gh-release@master
         with:
           tag_name: ${{ github.ref_name }}
