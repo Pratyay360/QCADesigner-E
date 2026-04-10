@@ -2,7 +2,7 @@
 # Installation
 
 Download the appimage from the packages secton 
-I have just repackaged this..
+I have just repackaged this.. (vibe coded with codex )
 
 all the work is by the original authors ..
  
