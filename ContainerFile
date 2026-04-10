@@ -1,21 +1,23 @@
-# Stage 1: build
-FROM docker.io/luigidifraia/gtk2-dev:alpine-3.20.3 AS builder
+# syntax=docker/dockerfile:1
 
-RUN apk add --no-cache \
-    autoconf \
-    automake \
-    make \
-    gcc \
-    musl-dev \
-    pkgconfig \
-    gtk+2.0-dev \
-    glib-dev \
-    librsvg-dev \
-    gettext-dev \
-    intltool \
-    file \
-    wget \
-    bash
+# Stage 1: build QCADesignerE on a glibc base (required by linuxdeploy AppImage tooling)
+FROM ubuntu:22.04 AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      autoconf \
+      automake \
+      build-essential \
+      ca-certificates \
+      file \
+      gettext \
+      intltool \
+      libgtk2.0-dev \
+      librsvg2-dev \
+      pkg-config \
+      wget && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY . /app
 WORKDIR /app/QCADesignerE
@@ -23,7 +25,7 @@ WORKDIR /app/QCADesignerE
 RUN chmod +x autogen.sh configure install-sh compile depcomp missing mkinstalldirs
 RUN ./autogen.sh
 RUN ./configure --prefix=/usr
-RUN make -j$(nproc)
+RUN make -j"$(nproc)"
 RUN make install DESTDIR=/app/AppDir
 
 # Stage 2: assemble AppDir and build AppImage
@@ -53,12 +55,17 @@ RUN wget -q https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk
 
 WORKDIR /app
 
+# AppImage tools are themselves AppImages; force extract-and-run inside containers.
+ENV APPIMAGE_EXTRACT_AND_RUN=1
+ENV ARCH=x86_64
+
 RUN DEPLOY_GTK_VERSION=2 \
     OUTPUT=QCADesignerE-x86_64.AppImage \
-    linuxdeploy \
+    /usr/local/bin/linuxdeploy \
       --appdir AppDir \
       --executable AppDir/usr/bin/QCADesignerE \
       --desktop-file AppDir/usr/share/applications/QCADesignerE.desktop \
       --icon-file AppDir/usr/share/icons/hicolor/48x48/apps/QCADesignerE.png \
       --plugin gtk \
-      --output appimage
+      --output appimage && \
+    test -f /app/QCADesignerE-x86_64.AppImage
