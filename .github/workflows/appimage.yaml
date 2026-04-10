@@ -1,5 +1,3 @@
-name: AppImage
-
 on:
   push:
     branches: ["main", "master"]
@@ -10,9 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@main
 
       - name: Build AppImage inside Docker
         run: |
@@ -29,42 +26,7 @@ jobs:
           docker rm "$id"
 
       - name: Upload AppImage artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: QCADesignerE-AppImage
-          path: QCADesignerE-x86_64.AppImage
-          if-no-files-found: error    make this release artifacts name: AppImage
-
-on:
-  push:
-    branches: ["main", "master"]
-  pull_request:
-    branches: ["main", "master"]
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build AppImage inside Docker
-        run: |
-          docker build \
-            --file ContainerFile \
-            --target appimage \
-            --tag qcadesignere-appimage \
-            .
-
-      - name: Extract AppImage from container
-        run: |
-          id=$(docker create qcadesignere-appimage)
-          docker cp "$id:/app/QCADesignerE-x86_64.AppImage" ./QCADesignerE-x86_64.AppImage
-          docker rm "$id"
-
-      - name: Upload AppImage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@main
         with:
           name: QCADesignerE-AppImage
           path: QCADesignerE-x86_64.AppImage
