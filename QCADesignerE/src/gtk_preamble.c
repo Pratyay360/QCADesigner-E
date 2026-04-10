@@ -113,6 +113,17 @@ void gtk_preamble (int *pargc, char ***pargv, char *pszBaseName)
   g_free (psz) ;
 #else /* ifndef WIN32 */
   // -- Pixmaps used by the buttons in the main window -- //
+  // When running as an AppImage, $APPDIR is set by the runtime; use it to
+  // locate the installed pixmaps before falling back to compile-time paths.
+  {
+  const char *pszAppDir = g_getenv ("APPDIR") ;
+  char *psz = NULL ;
+  if (NULL != pszAppDir)
+    {
+    add_pixmap_directory (psz = g_strdup_printf ("%s/usr/share/QCADesigner/pixmaps", pszAppDir)) ;
+    g_free (psz) ;
+    }
+  }
   add_pixmap_directory (PACKAGE_DATA_DIR "/QCADesigner/pixmaps");
   add_pixmap_directory (PACKAGE_SOURCE_DIR "/pixmaps");
 #endif /* ifdef WIN32 */
