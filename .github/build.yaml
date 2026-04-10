@@ -1,0 +1,42 @@
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: ["main", "master"]
+  # pull_request:
+  #   branches: ["main", "master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Build AppImage inside Docker
+        run: |
+          docker build \
+            --file ContainerFile \
+            --target appimage \
+            --tag qcadesignere-appimage \
+            .
+
+      - name: Extract AppImage from container
+        run: |
+          id=$(docker create qcadesignere-appimage)
+          docker cp "$id:/app/QCADesignerE-x86_64.AppImage" ./QCADesignerE-x86_64.AppImage
+          docker rm "$id"
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: QCADesignerE-AppImage
+          path: QCADesignerE-x86_64.AppImage
+          if-no-files-found: error
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@master
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: QCADesignerE-x86_64.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
