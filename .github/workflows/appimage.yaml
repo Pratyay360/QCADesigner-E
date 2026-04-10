@@ -30,8 +30,8 @@ jobs:
         with:
           name: QCADesignerE-AppImage
           path: QCADesignerE-x86_64.AppImage
-          if-no-files-found: error    make this release artifacts    
-          
+          if-no-files-found: error
+    
       - name: Create Release and Upload Asset
         uses: softprops/action-gh-release@master
         with:
