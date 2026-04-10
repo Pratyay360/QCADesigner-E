@@ -8,8 +8,6 @@ permissions:
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-    environment:
-      token: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Install GitHub CLI
         run: sudo apt-get install gh jq -y
