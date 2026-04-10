@@ -516,7 +516,8 @@ void set_window_icon (GtkWindow *window, char *pszBaseName)
 #ifdef HAVE_LIBRSVG
   pszIconFile = find_pixmap_file (psz = g_strdup_printf ("%s.svg", pszBaseName)) ;
   g_free (psz) ;
-  if (!((NULL == window)
+  if (NULL == pszIconFile ||
+      !((NULL == window)
     ? gtk_window_set_default_icon_from_file (pszIconFile, NULL)
     : gtk_window_set_icon_from_file (window, pszIconFile, NULL)))
     {
