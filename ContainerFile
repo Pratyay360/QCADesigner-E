@@ -41,7 +41,7 @@ RUN cp /app/QCADesignerE/pixmaps/QCADesignerE_0_48x48x24a.png \
     cp /app/QCADesignerE/pixmaps/QCADesignerE.svg \
        /app/AppDir/usr/share/icons/hicolor/scalable/apps/QCADesignerE.svg
 
-RUN printf '[Desktop Entry]\nName=QCADesignerE\nExec=QCADesignerE %%f\nIcon=QCADesignerE\nType=Application\nCategories=Development;Science;Education;\nComment=QCA circuit designer and simulator\n' \
+RUN printf '[Desktop Entry]\nName=QCADesignerE\nExec=QCADesigner %f\nIcon=QCADesignerE\nType=Application\nCategories=Development;Science;Education;\nComment=QCA circuit designer and simulator\n' \
     > /app/AppDir/usr/share/applications/QCADesignerE.desktop
 
 # Download linuxdeploy and GTK plugin (x86_64)
@@ -63,7 +63,7 @@ RUN DEPLOY_GTK_VERSION=2 \
     OUTPUT=QCADesignerE-x86_64.AppImage \
     /usr/local/bin/linuxdeploy \
       --appdir AppDir \
-      --executable AppDir/usr/bin/QCADesignerE \
+      --executable AppDir/usr/bin/QCADesigner \
       --desktop-file AppDir/usr/share/applications/QCADesignerE.desktop \
       --icon-file AppDir/usr/share/icons/hicolor/48x48/apps/QCADesignerE.png \
       --plugin gtk \
