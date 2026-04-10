@@ -1,5 +1,4 @@
 name: AppImage
-
 on:
   push:
     branches: ["main", "master"]
@@ -32,5 +31,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: QCADesignerE-AppImage
-          path: QCADesignerE-x86_64.AppImage
+          path: ./QCA*.AppImage
           if-no-files-found: error
