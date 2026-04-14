@@ -17,7 +17,7 @@ chmod +x QCADesignerE-x86_64.AppImage
 ---
 
 How to use this :) I really don't know..
-have done this appimage thing to make a static executable for [prerna12github](prerna12github) .  
+have done this appimage thing to make a static executable for [prerna12github](/prerna12github) .  
 
 ---
 
