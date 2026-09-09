@@ -5,7 +5,10 @@ Download the appimage from the packages secton
 I have just repackaged this.. (vibe coded with codex )
 
 all the work is by the original authors ..
+ <a href="https://github.com/Pratyay360/QCADesigner-E/releases/download/main/QCADesignerE-x86_64.AppImage">
  
+<img width="182" height="56" alt="image" src="https://github.com/user-attachments/assets/4bf17a28-cbb7-46d4-be38-a79f4bcc4513" />
+</a>
 
 ```sh
 chmod +x QCADesignerE-x86_64.AppImage
