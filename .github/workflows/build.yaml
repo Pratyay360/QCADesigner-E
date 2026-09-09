@@ -27,7 +27,7 @@ jobs:
       - name: Extract AppImage from container
         run: |
           ctr=$(buildah from qcadesignere-appimage)
-          buildah cp "$ctr:/app/QCADesignerE-x86_64.AppImage" ./QCADesignerE-x86_64.AppImage
+          buildah copy "$ctr:/app/QCADesignerE-x86_64.AppImage" ./QCADesignerE-x86_64.AppImage
           buildah rm "$ctr"
 
       - name: Upload AppImage artifact
