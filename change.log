@@ -7,14 +7,14 @@ configure
 
 
 VERSION: 2.1 (05/SEP/2017)
-- coherence_vector_energy simulation can be chosen 
+- coherence_vector_energy simulation can be chosen
 - modified options for coherence_vector_energy simulation
 - cells can have the option "Ignore Dissipation Energy", which ignores the cell energy at energy simulations
 - definition of coordinates for exact energy data logging into file Diss.trace
 - frequency of input signals can be changed (input_period)
 
 
-- added files: 
+- added files:
 src/.deps/QCADesigner-coherence_vector_energy_properties_dialog.Po
 src/.deps/QCADesigner-coherence_vector_energy.Po
 src/.deps/batch_sim-coherence_vector_energy.Po
@@ -30,4 +30,3 @@ src/fileio.c src/fileio.h
 src/callbacks.c src/callback_helpers.h
 src/main_batch_sim.c
 src/global_consts.h
-

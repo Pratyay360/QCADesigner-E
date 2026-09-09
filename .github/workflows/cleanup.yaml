@@ -1,35 +1,33 @@
+name: Clean Workflow Runs
+
 on:
+  schedule:
+    - cron: '0 0 * * 0'
   workflow_dispatch:
+    inputs:
+      retain_days:
+        description: 'Number of days to keep runs (0 to delete all)'
+        required: false
+        default: '0'
+        type: string
+      keep_minimum_runs:
+        description: 'Minimum number of runs to keep per workflow'
+        required: false
+        default: '0'
+        type: string
 
 permissions:
   actions: write
-  contents: write
+  contents: read
 
 jobs:
-  cleanup:
+  clean-runs:
     runs-on: ubuntu-latest
     steps:
-      - name: Install GitHub CLI
-        run: sudo apt-get install gh jq -y
-      - name: Delete old workflow runs
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          owner="${{ github.repository_owner }}"
-          repo="${{ github.event.repository.name }}"
-
-          echo "Fetching workflow runs for $owner/$repo..."
-
-          runs=$(gh api /repos/$owner/$repo/actions/runs | jq -r '.workflow_runs[] | select(.conclusion=="failure") | .id')
-
-          if [ -z "$runs" ]; then
-            echo "No workflow runs found."
-            exit 0
-          fi
-
-          for id in $runs; do
-            echo "Deleting workflow run ID $id"
-            gh api -X DELETE /repos/$owner/$repo/actions/runs/$id
-          done
-
-          echo "All failed workflow runs deleted."
+      - name: Delete Workflow Runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: ${{ inputs.retain_days || '0' }}
+          keep_minimum_runs: ${{ inputs.keep_minimum_runs || '0' }}
