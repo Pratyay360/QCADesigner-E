@@ -8,19 +8,27 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: Build AppImage inside Docker
+      - name: Install Buildah
         run: |
-          docker build \
-            --file ContainerFile \
+          if ! command -v buildah >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y buildah
+          fi
+          buildah --version
+
+      - name: Build AppImage with Buildah
+        run: |
+          buildah bud \
+            --file Containerfile \
             --target appimage \
             --tag qcadesignere-appimage \
             .
 
       - name: Extract AppImage from container
         run: |
-          id=$(docker create qcadesignere-appimage)
-          docker cp "$id:/app/QCADesignerE-x86_64.AppImage" ./QCADesignerE-x86_64.AppImage
-          docker rm "$id"
+          ctr=$(buildah from qcadesignere-appimage)
+          buildah cp "$ctr:/app/QCADesignerE-x86_64.AppImage" ./QCADesignerE-x86_64.AppImage
+          buildah rm "$ctr"
 
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@main
@@ -31,7 +39,6 @@ jobs:
 
       - name: Install lint dependencies
         run: |
-          sudo rm -f /etc/apt/sources.list.d/google-chrome.list*
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends desktop-file-utils libfile-mimeinfo-perl file
 

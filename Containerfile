@@ -52,7 +52,7 @@ WORKDIR /app
 
 ENV APPIMAGE_EXTRACT_AND_RUN=1
 ENV ARCH=x86_64
-ENV GDK_MODULES="" 
+ENV GDK_MODULES=""
 RUN DEPLOY_GTK_VERSION=2 \
     OUTPUT=QCADesignerE-x86_64.AppImage \
     /usr/local/bin/linuxdeploy \
