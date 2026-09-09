@@ -1,0 +1,31 @@
+name: Test AppImage
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Build AppImage"]
+    types:
+      - completed
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Download AppImage artifact from build workflow
+        uses: actions/download-artifact@main
+        with:
+          name: QCADesignerE-AppImage
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Make AppImage executable
+        run: chmod +x QCADesignerE-x86_64.AppImage
+
+      - name: Download appdir-lint.sh
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/AppImageCommunity/pkg2appimage/refs/heads/master/appdir-lint.sh -o appdir-lint.sh
+          chmod +x appdir-lint.sh
+
+      - name: Run appdir-lint on the AppImage
+        run: ./appdir-lint.sh QCADesignerE-x86_64.AppImage
