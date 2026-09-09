@@ -29,15 +29,32 @@ jobs:
           path: QCADesignerE-x86_64.AppImage
           if-no-files-found: error
 
-
+      - name: Install lint dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends desktop-file-utils libfile-mimeinfo-perl file
 
       - name: Download appdir-lint.sh
         run: |
           curl -fsSL https://raw.githubusercontent.com/AppImageCommunity/pkg2appimage/refs/heads/master/appdir-lint.sh -o appdir-lint.sh
+          curl -fsSL https://raw.githubusercontent.com/AppImageCommunity/pkg2appimage/refs/heads/master/excludelist -o excludelist
           chmod +x appdir-lint.sh
+          test -f excludelist
 
       - name: Run appdir-lint on the AppImage
-        run: ./appdir-lint.sh QCADesignerE-x86_64.AppImage
+        run: |
+          chmod +x QCADesignerE-x86_64.AppImage
+          # appdir-lint.sh validates an extracted AppDir, not a .AppImage file.
+          # Extract first, then lint the extracted directory.
+          ./QCADesignerE-x86_64.AppImage --appimage-extract
+          ./appdir-lint.sh squashfs-root || {
+            echo "appdir-lint validation failed. Diagnostics:"
+            echo "--- top-level entries ---"
+            ls -la squashfs-root || true
+            echo "--- desktop file(s) ---"
+            cat squashfs-root/*.desktop || true
+            exit 1
+          }
 
       - name: Create Release and Upload Asset
         uses: softprops/action-gh-release@master
@@ -46,4 +63,4 @@ jobs:
           name: Release ${{ github.ref_name }}
           files: QCADesignerE-x86_64.AppImage
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
