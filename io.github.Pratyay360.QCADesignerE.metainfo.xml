@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.Pratyay360.QCADesignerE</id>
+
+  <name>QCADesigner-E</name>
+  <summary>Quantum-dot Cellular Automata (QCA) circuit designer and simulator</summary>
+
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+
+  <developer id="io.github.pratyay360">
+    <name>Pratyay Mustafi / QCADesigner-E Authors</name>
+  </developer>
+
+  <description>
+    <p>
+      QCADesigner-E is an extension of QCADesigner (version 2.0.3) developed at the University of Bremen.
+      It implements the estimation of the power dissipation of Quantum-dot Cellular Automata (QCA) circuits
+      based on the works of Timler and Lent et al.
+    </p>
+    <p>
+      The extension is integrated as an additional simulation module based on the Coherence Vector
+      Simulation Engine (CVSE). QCADesigner-E is fully compatible with QCA designs generated with
+      QCADesigner version 2.0.3.
+    </p>
+    <p>Key capabilities:</p>
+    <ul>
+      <li>Interactive schematic design and layout of QCA circuits</li>
+      <li>Energy dissipation and power estimation using CVSE</li>
+      <li>Bistable and Coherence Vector simulation engines</li>
+      <li>Exhaustive and vector-table based verification</li>
+      <li>Multi-layer support, clock zone assignment, and customizable cell properties</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.Pratyay360.QCADesignerE.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>QCADesigner-E layout and simulation interface</caption>
+      <image>https://raw.githubusercontent.com/Pratyay360/QCADesigner-E/main/docs/screenshot.png</image>
+      <image>https://camo.githubusercontent.com/103346fda5391337ae0a2707ad08a6d8b60f967a11d0b6bf4e89c6fc338b1bd9/68747470733a2f2f73362e696d6763646e2e6465762f594a4e774c672e706e67</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://github.com/Pratyay360/QCADesigner-E</url>
+  <url type="bugtracker">https://github.com/Pratyay360/QCADesigner-E/issues</url>
+  <url type="donation">https://pratyayupi.surge.sh</url>
+  <url type="help">https://github.com/Pratyay360/QCADesigner-E#information</url>
+
+  <provides>
+    <binary>QCADesigner</binary>
+  </provides>
+
+  <categories>
+    <category>Science</category>
+    <category>Engineering</category>
+  </categories>
+
+  <content_rating type="oars-1.1" />
+
+  <releases>
+    <release version="1.0" date="2024-01-01">
+      <description>
+          <p>QCADesigner-E appimage</p>
+      </description>
+    </release>
+  </releases>
+</component>

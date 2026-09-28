@@ -10,17 +10,17 @@ all the work is by the original authors ..
    <img width="182" alt="Button Text" src="https://github.com/user-attachments/assets/4bf17a28-cbb7-46d4-be38-a79f4bcc4513" />
 </a>
 
-![YJNwLg.png](https://s6.imgcdn.dev/YJNwLg.png)
-app demo
+![QCADesigner-E GUI](docs/screenshot.png)
+
+![YJNwLg.png](https://camo.githubusercontent.com/103346fda5391337ae0a2707ad08a6d8b60f967a11d0b6bf4e89c6fc338b1bd9/68747470733a2f2f73362e696d6763646e2e6465762f594a4e774c672e706e67)
+
 
 ```sh
 chmod +x QCADesignerE-x86_64.AppImage
-```
-```sh
 ./QCADesignerE-x86_64.AppImage
 ```
 
----
+
 
 How to use this :) I really don't know..
 have done this appimage thing to make a static executable for [prerna12github](https://github.com/prerna12github) .

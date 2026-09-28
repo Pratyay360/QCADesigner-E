@@ -26,27 +26,31 @@ jobs:
             --tag qcadesignere-appimage \
             .
 
-      - name: Extract AppImage from container
+      - name: Extract AppImage and zsync from container
         run: |
           buildah unshare -- bash -e -c '
             ctr=$(buildah from qcadesignere-appimage)
             mnt=$(buildah mount "$ctr")
             cp "$mnt/app/QCADesignerE-x86_64.AppImage" ./QCADesignerE-x86_64.AppImage
+            cp "$mnt/app/QCADesignerE-x86_64.AppImage.zsync" ./QCADesignerE-x86_64.AppImage.zsync
             buildah unmount "$ctr"
             buildah rm "$ctr"
           '
+          ls -la QCADesignerE-x86_64.*
 
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@main
         with:
           name: QCADesignerE-AppImage
-          path: QCADesignerE-x86_64.AppImage
+          path: |
+            QCADesignerE-x86_64.AppImage
+            QCADesignerE-x86_64.AppImage.zsync
           if-no-files-found: error
 
       - name: Install lint dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends desktop-file-utils libfile-mimeinfo-perl file
+          sudo apt-get install -y --no-install-recommends desktop-file-utils libfile-mimeinfo-perl file appstream
 
       - name: Download appdir-lint.sh
         run: |
@@ -73,6 +77,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          files: QCADesignerE-x86_64.AppImage
+          files: |
+            QCADesignerE-x86_64.AppImage
+            QCADesignerE-x86_64.AppImage.zsync
         env:
           GITHUB_TOKEN: ${{ github.token }}
